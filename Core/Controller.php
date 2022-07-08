@@ -1,5 +1,7 @@
 <?php
+
 namespace Core;
+
 use App\Auth;
 use App\Flash;
 use Core\Http\Res;
@@ -21,7 +23,8 @@ abstract class Controller
     /**
      * Contruct method Store route params
      */
-    public function __construct($route_params){
+    public function __construct($route_params)
+    {
         $this->route_params = $route_params;
     }
 
@@ -34,18 +37,16 @@ abstract class Controller
      */
     public function __call($method, $args)
     {
-        $method = '_'.$method;
-        if(method_exists($this, $method)){
+        $method = '_' . $method;
+        if (method_exists($this, $method)) {
 
-            if($this->before() !== false){
+            if ($this->before() !== false) {
 
                 call_user_func_array([$this, $method], $args);
                 $this->after();
-
             }
+        } else {
 
-        }else{
-            
             throw new \Exception("Method $method in Controller class $this not Found");
         }
     }
@@ -59,7 +60,7 @@ abstract class Controller
         $expdate = time() + 60 * 60 * 24;
         $timenow = time();
 
-        if($timenow > $expdate){
+        if ($timenow > $expdate) {
             $this->redirect('/auth/activate');
         }
     }
@@ -81,7 +82,7 @@ abstract class Controller
      */
     protected function redirect($url)
     {
-        header('Location: http://'.$_SERVER['HTTP_HOST'].$url, true, 303);
+        header('Location: http://' . $_SERVER['HTTP_HOST'] . $url, true, 303);
         exit;
     }
 
@@ -93,7 +94,7 @@ abstract class Controller
      */
     protected function requireLogin()
     {
-        if(! Auth::getUser()){
+        if (!Auth::getUser()) {
             Auth::rememberRequestedPage();
             // Flash::addMessage('Login First', Flash::INFO);
             return \http_response_code(401);
@@ -109,7 +110,7 @@ abstract class Controller
      */
     protected function requireAdmin()
     {
-        if(! Auth::getAdmin()){
+        if (!Auth::getAdmin()) {
             $this->redirect('/master');
             return \http_response_code(401);
         }
@@ -119,36 +120,65 @@ abstract class Controller
     {
         $error = [];
         foreach ($data as $key => $value) {
-            if($value == '' || empty($value)):
-                $error[$key] = $key.' is Required';
+            if ($value == '' || empty($value)) :
+                $error[$key] = $key . ' is Required';
             endif;
         }
-        if(!empty($error)) Res::status(400)->json(['error' => $error]);
+        if (!empty($error)) Res::status(400)->json(['error' => $error]);
         return true;
     }
 
-    protected function contact($a, $b, $c){
+    public static function requires(array $params = [])
+    {
+        foreach ($params as $key => $value) {
+            [$val, $type] = explode('||', $value);
+            $type = trim($type);
+            $val = trim($val);
+            if ($val !== '') {
+                if ($type == 'int') {
+                    if ((int) $val == 0) $error[$key] = "$key cannot be zero";
+                    if (!preg_match('/^\d+$/', $val)) $error[$key] = "$key requires an integer";
+                } elseif ($type == 'amount') {
+                    if (!is_numeric($val)) $error[$key] = "$key requires a valid amount";
+                } elseif ($type == 'string') {
+                    if (!preg_match('/^([a-zA-Z_ ])+$/', $val)) $error[$key] = $key . ' requires A-Za-z';
+                } elseif ($type == 'alnum') {
+                    if (!preg_match('/^[a-zA-Z]\.*/', $val)) $error[$key] = $key . ' Must start with an alphabet';
+                }elseif ($type == 'any') {
+                    if (!preg_match('/\.*/', $val)) $error[$key] = $key . 'Invalid Characters';
+                }
+            } else {
+                $error[$key] = 'Field Cannot be empty';
+            }
+        }
+        
+        if (!empty($error)) Res::status(400)->error($error);
+        return true;
+    }
+
+    protected function contact($a, $b, $c)
+    {
 
         $contacts = [];
         $names = [];
         $contact = '';
-        for($i=0; $i<count($a); $i++){
-            if(count($a) == count($b)){
-               $contacts[] = "$a[$i], $b[$i]"; 
+        for ($i = 0; $i < count($a); $i++) {
+            if (count($a) == count($b)) {
+                $contacts[] = "$a[$i], $b[$i]";
             }
         }
-        foreach($contacts as $contacts){
-            if(strrpos($contacts, $c) == true){
+        foreach ($contacts as $contacts) {
+            if (strrpos($contacts, $c) == true) {
                 $names[] = $contacts;
             }
         }
-        foreach($names as $name){
+        foreach ($names as $name) {
             $str = explode(',', $name);
-            $contact .= $str[0].',';
+            $contact .= $str[0] . ',';
         }
 
-        if($contact != '')
-            return preg_replace('/[,]+$/','',$contact);
+        if ($contact != '')
+            return preg_replace('/[,]+$/', '', $contact);
         else
             return 'No Matched Contact';
         // return '<pre>'.htmlspecialchars(print_r($names, true)).'</pre>';
@@ -162,7 +192,8 @@ abstract class Controller
      * @param string $string any
      * @return string
      */
-    public function jwt($type, $string){
+    public function jwt($type, $string)
+    {
         $output = '';
 
         $enc_type = 'AES-256-CBC';
@@ -172,11 +203,11 @@ abstract class Controller
         $key = \hash('sha256', $secret);
         $initVect = \substr(\hash('sha256', $secret_iv), 0, 16);
 
-        if($type == 'enc'){
+        if ($type == 'enc') {
             $output = \openssl_encrypt($string, $enc_type, $key, 0, $initVect);
             $output = \base64_encode($output);
         }
-        if($type == 'dec'){
+        if ($type == 'dec') {
             $output = \base64_decode($string);
             $output = \openssl_decrypt($output, $enc_type, $key, 0, $initVect);
         }

@@ -18,13 +18,13 @@ class App extends Component
     //     View::component('app/topbar');
     // }
 
-    public function _body($body, $page = null)
+    public function _body($body, $menu = null, $page = null, $other = null)
     {
         $page;
         echo '<div class="nk-content ">
         <div class="container wide-xl">
         <div class="nk-content-inner">';
-        View::component('app/sidebar');
+        View::component('app/sidebar', ['authority' => $menu, 'other' => $other]);
         echo '<div class="nk-content-body">';
         echo ' <div class="nk-content-wrap">';
         require_once $body;

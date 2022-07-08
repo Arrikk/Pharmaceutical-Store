@@ -1,3 +1,12 @@
+<?php
+
+use App\Helpers\Menu;
+
+$menus = [];
+if ($authority == MANAGER) $menus = Menu::manager();
+if ($authority == COMPANY) $menus = Menu::company();
+if ($authority == ADMINISTRATOR) $menus = Menu::admin();
+?>
 <div class="nk-aside" data-content="sideNav" data-toggle-overlay="true" data-toggle-screen="lg" data-toggle-body="true">
     <div class="nk-sidebar-menu" data-simplebar>
         <ul class="nk-menu nk-menu-main">
@@ -51,37 +60,15 @@
             <li class="nk-menu-heading">
                 <h6 class="overline-title text-primary-alt">Dashboard</h6>
             </li><!-- .nk-menu-heading -->
-            <li class="nk-menu-item">
-                <a href="/dashboard/index" class="nk-menu-link">
-                    <span class="nk-menu-icon"><em class="icon ni ni-dashlite"></em></span>
-                    <span class="nk-menu-text">Dashboard</span>
-                </a>
-            </li>
-            <!-- .nk-menu-item -->
-            <li class="nk-menu-item">
-                <a href="/admin/users" class="nk-menu-link">
-                    <span class="nk-menu-icon"><em class="icon ni ni-users"></em></span>
-                    <span class="nk-menu-text">Users</span>
-                </a>
-            </li>
-            <li class="nk-menu-item">
-                <a href="/admin/kyc" class="nk-menu-link">
-                    <span class="nk-menu-icon"><em class="icon ni ni-file-docs"></em></span>
-                    <span class="nk-menu-text">AML / KYCs</span>
-                </a>
-            </li>
-            <li class="nk-menu-item">
-                <a href="/admin/referrals" class="nk-menu-link">
-                    <span class="nk-menu-icon"><em class="icon ni ni-users"></em></span>
-                    <span class="nk-menu-text">Referrals</span>
-                </a>
-            </li>
-            <li class="nk-menu-item">
-                <a href="/admin/withdrawal" class="nk-menu-link">
-                    <span class="nk-menu-icon"><em class="icon ni ni-wallet-out"></em></span>
-                    <span class="nk-menu-text">Withdrawals</span>
-                </a>
-            </li>
+
+            <?php foreach ($menus as $menu => $value) : ?>
+                <li class="nk-menu-item">
+                    <a href="<?= $value['link'] ?>" class="nk-menu-link">
+                        <span class="nk-menu-icon"><em class="<?= $value['icon'] ?>"></em></span>
+                        <span class="nk-menu-text"><?= $menu ?></span>
+                    </a>
+                </li>
+            <?php endforeach; ?>
             <!-- .nk-menu-item -->
         </ul><!-- .nk-menu -->
     </div><!-- .nk-sidebar-menu -->

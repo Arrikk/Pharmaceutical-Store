@@ -32,8 +32,8 @@ date_default_timezone_set('Africa/Lagos');
  */
 
 error_reporting(E_ALL);
-set_error_handler('Core\Error::errorHandler');
-set_exception_handler('Core\Error::exceptionHandler');
+// set_error_handler('Core\Error::errorHandler');
+// set_exception_handler('Core\Error::exceptionHandler');
 
 // define('URL', $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].'/');
 /**

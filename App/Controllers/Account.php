@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Controllers\Authenticated\Authenticated;
+use App\Models\User;
 use Core\Http\Res;
 
 /**

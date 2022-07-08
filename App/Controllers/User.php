@@ -3,12 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\Authenticated\Authenticated;
-use App\Models\Feed\Tips;
-use App\Models\Settings\Settings;
 use App\Models\User as ModelsUser;
-use App\Models\User\Friends;
-use App\Models\User\Suggestions;
-use App\Models\Wallet\Wallet;
 use Core\Http\Res;
 use Core\View;
 
@@ -16,64 +11,46 @@ class User extends Authenticated
 {
     public function index()
     {
-        // Res::send("<h1>Leviplatte API</h1>");
-        View::render('dashboard/index.html');
+        Res::send("<pre>
+        ---
+        title: PHARMACY MGT API
+        slug: Web/API/PHARMACY MGT_API
+        page-type: web-api-overview
+        tags:
+          - API
+          - PHARMACY MGT API
+          - Reference
+          - Landing
+          - Experimental
+          - Active
+          - Standard
+        ---
+        </pre>");
     }
-    public function create($user)
-    {
-        // Res::json($user);
-        $user->username = "Lev" . rand(9999, 999999999);
-        $userModel = new ModelsUser($user);
-        if ($user = $userModel->save()) # save credentials
-            return Res::status(200)->json($user); #Return if true
-        return Res::send($user); # return if error
-    }
-
 
     public function login($data)
     {
-        if (isset($data->email) && isset($data->password)) :
-            if ($user = ModelsUser::authenticate($data->email, $data->password)) :
-                $token = $this->jwt('enc', json_encode([
-                    'id' => (int) $user->id,
-                    'is_admin' => (int) $user->is_admin == 1 ? true : false,
-                    'expires' => time() + 60 * 60 * 24
-                ]));
-                Res::json(['token' => $token]);
-            else :
-                Res::send($user);
-            endif;
+     
+        extract( (array) $data);
+        $login = $login ?? '';
+        $password = $password ?? '';
+        
+        $this->requires([
+            'login' => "$login || string",
+            'password' => "$password || any"
+        ]);
+
+        if ($user = ModelsUser::authenticate($login, $password)) :
+            $token = $this->jwt('enc', json_encode([
+                'id' => (int) $user->id,
+                'authority' => (string) $user->authority,
+                'expires' => time() + 60 * 60 * 24
+            ]));
+            Res::json(['token' => $token]);
         else :
-            Res::status(400)->send('Fields error');
+            Res::send($user);
         endif;
     }
-
-    // public function _get()
-    // {
-    //     $id = $this->user->id;
-    //     $user = ModelsUser::getUser($id);
-    //     $settings = Settings::setting($id);
-    //     $wallet = Wallet::getWallet($id);
-
-    //     $output = array_merge((array) $user, ['wallet' => $wallet->balance]);
-
-    //     foreach($settings as $val):
-    //         $output['display'] = $val->setting_name == 'mode' ? $val->setting_value : 'light';
-    //         if($val->setting_name == 'mode') continue;
-    //         $output[$val->setting_name] = $val->setting_value ? true : false;
-    //     endforeach;
-
-    //     Res::json($output);
-
-    // }
-    // public function user()
-    // {
-    //     $id = (int) $this->route_params['user'] ?? '';
-    //     $user = ModelsUser::getUser($id);
-
-    //     Res::json($user);
-
-    // }
 
     public function _users($data)
     {
@@ -82,10 +59,6 @@ class User extends Authenticated
         Res::json($users);
     }
 
-    public function getUserListAnalytic()
-    {
-        Res::json(ModelsUser::userListCount());
-    }
 
     public function _update($update)
     {
@@ -119,47 +92,5 @@ class User extends Authenticated
         if (!isset($user->check))
             Res::status(400)->json(['error' => 'Provide email or username to check']);
         Res::json(['exists' => ModelsUser::userExists($user->check)]);
-    }
-
-    public function _follow($data)
-    {
-        $to = $this->route_params['id'] ?? false;
-        if ( $to ) :
-        $data->toFollow = $to;
-        $data->isFollowing = $this->user->id;
-        if($follow = Friends::friend($data))
-            Res::json(['status' => true, 'message' => $follow]);
-            Res::status(400)->json(['error' => 'Operation Failed']);
-        else:
-            Res::status(400)->json(['error' => "Action Denied"]);
-        endif;
-    }
-
-    public function getFullProfile()
-    {
-        $id = $this->route_params['id'];
-        Res::json(ModelsUser::getFullProfile($id));
-    }
-
-    public function changeEmail()
-    {
-        
-    }
-
-    public function _tip($data)
-    {
-        $param = [
-            'amount' => $data->amount ?? '',
-            'beneficiary' => $data->beneficiary ?? '',
-            'currentUser' => $this->user->id
-        ];
-
-        $this->required($param);
-        Res::json(Tips::tipUser((object) $param));
-    }
-
-    public function _suggestions()
-    {
-        Res::json(Suggestions::suggest($this->user->id));
     }
 }

@@ -20,6 +20,12 @@ final class Res implements Resinterface
         echo json_encode($message);
         return exit;
     }
+    public static function error($message = null)
+    {
+        header('content-type: application/json');
+        echo json_encode(['error' => $message]);
+        return exit;
+    }
 
     public static function send($message = null)
     {

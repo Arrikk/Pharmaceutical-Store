@@ -10,7 +10,9 @@ App::render(
      View::component('app/topbar'),
      App::body( 
           dirname(__FILE__) .'/'. $__page . '.php',
-          $page ?? 'list'
+          $authority = $_authority,
+          $page ?? 'list',
+          $other = $_other ?? null
      ),
      View::component('app/htmlend')
 );

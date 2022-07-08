@@ -53,7 +53,7 @@ class Password extends Authenticated
                 $user->resetPassword($data->newPassword);
             } else {
                 Res::status(401)->json(['error' => 'Old password not correct']);
-            }
+            }   
         endif;
     }
 }

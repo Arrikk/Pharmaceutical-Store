@@ -1,7 +1,7 @@
 <?php
 namespace Core;
 
-abstract class Component {
+class Component {
 
     static function __callStatic($name, $arguments)
     {

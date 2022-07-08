@@ -20,10 +20,10 @@ class Admin extends Controller
             $token = $_SESSION['token'];
             if ($token = $this->jwt('dec', $token)) :
                 $this->user = json_decode($token);
-                if(!$this->user->is_admin){
-                    Auth::logout();
-                    $this->redirect('/auth/login');
-                }
+                // if(!$this->user->is_admin){
+                //     Auth::logout();
+                //     $this->redirect('/login');
+                // }
                 if(time() > $this->user->expires):
                     Auth::logout();
                     $this->redirectWithUrl();

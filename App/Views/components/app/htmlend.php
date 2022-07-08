@@ -145,7 +145,7 @@
         localStorage.getItem("token") :
         "";
 
-    window.levi = {
+    window.bz = {
         defaults: {
             items: [],
             totalItems: 0,
@@ -153,9 +153,9 @@
             loading: true,
             limit: 10,
             order: "DESC",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+        },
+        headers: {
+            Authorization: `Bearer ${token}`,
         },
         money: (money) => {
             return (+money).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');

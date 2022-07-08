@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Helpers\Format;
+use App\Helpers\Paginate;
 use App\Models\Wallet\Transactions;
 use App\Models\Lists\Blocked;
 use App\Models\Lists\Bookmark;
@@ -102,30 +104,6 @@ class User extends \Core\Model
         };
         return Res::status(400)->json($this->errors);
     }
-
-    private function makeDefaultSettings($user, $name = '')
-    {
-        $id = $user->id;
-        Wallet::createWallet($id);
-        Friends::makeFriends($id);
-        CloseFriends::makeCloseFriends($id);
-        Blocked::makeBlock($id);
-        Bookmark::makeBookmark($id);
-        Restrict::makeRestrict($id);
-        Display::display($id);
-        Privacy::privacy($id, SHOW_ACTIVITY);
-        Privacy::privacy($id, SHOW_SUBSCRIPTION);
-        Referrals::make($user);
-        SubscriptionSettings::set($id);
-    }
-
-    public static function isVerified($id)
-    {
-        $user = self::findOne(['id' => $id], 'is_verified');
-        if ($user) return $user->is_verified;
-        else Res::status(404)->json(['error' => 'User not found']);
-    }
-
     /**
      * Update a user account
      * @param int $id id of user to update
@@ -137,25 +115,15 @@ class User extends \Core\Model
         $data = [];
         foreach ($item as $key => $value) {
             if ($key == 'request') continue;
+            if($value == '') continue;
             $data[$key] = is_int($key) ?
                 (int) static::clean($value) :
                 (string) static::clean($value);
         }
-        # if profile images are avaliable
-        if (isset($file)) :
-            if (isset($file['avatar'])) :
-                $avatar = Image::upload($file, 'avatar');
-                $data['avatar'] = $avatar->fullpath;
-            endif;
-            if (isset($file['profileCover'])) :
-                $cover = Image::upload($file, 'profileCover');
-                $data['profile_cover'] = $cover->fullpath;
-            endif;
-        endif;
-        
+
         if (!empty($data)) :
             $user = static::findAndUpdate(['id' => $id], $data);
-            return self::getUser($user->id);
+            return Format::data($user);
         endif;
     }
 
@@ -243,12 +211,12 @@ class User extends \Core\Model
      * @param string $password user password
      * @return object
      */
-    public static function authenticate($email, $password)
+    public static function authenticate($login, $password)
     {
         // extract($array);
-        $user = User::findByEmail($email);
-        if (!$user) return Res::status(400)->json(['Invalid Email Address']);
-        if (!password_verify($password, $user->password_hash)) return Res::status(400)->json(['Password Mismatch']);
+        $user = User::findOne(['email' => self::clean($login), 'or.username' => self::clean($login)]);
+        if (!$user) return Res::status(400)->error('Invalid Email Address');
+        if (!password_verify($password, $user->password_hash)) return Res::status(400)->error('Password Mismatch');
         return $user;
     }
 
@@ -259,115 +227,32 @@ class User extends \Core\Model
         return $user;
     }
 
-    public static function getUserMinified($userId)
+    public static function getUser($id)
     {
-        $user = self::findById($userId, 'id', 'username, is_verified, id, email, display_name, phone_number, avatar');
-        if (!$user) Res::status(404)->json(['error' => 'User Not Found']);
-        return (object) [
-            'id' => $user->id,
-            'username' => $user->username,
-            'email' => $user->email,
-            'display_name' => $user->display_name,
-            'phone_number' => $user->phone_number,
-            'avatar' => $user->avatar,
-            'isVerified' => $user->is_verified == 1
-        ];
+        $user = self::findOne(['id' => $id]);
+        return Format::data($user);
     }
 
     /**
-     * Get profile details of a user
-     * @param int $id ... id of ther user to get
-     * @param int $user ... current loggedin user
-     * 
+     * Get all accounts
+     * @param object|array $extra 
+     * @param string $authority
+     * return array
      */
-    public static function getUser($id, $user = null, $withFriends = false)
+    public static function accounts($authority, $extra = null)
     {
-        # check if this current logged in user is not null
-        # if the user is not null check if userId to find is
-        # not in the current user filtered lists
-        $blocked = false;
-        $restricted = false;
-        $bookmark = false;
-        $closeFrnds = false;
-        $followers = false;
-        $followings = false;
-        $isSubscribedToUserProfile = false;
+        $paginate = Paginate::page($extra);
+        $accounts = self::find([
+            'authority' => $authority,
+            'order.id' => $paginate->order,
+            '$.limit' => "$paginate->page"
+        ]);
 
-        if ($user) :
-            $blocked = Lists::inList($user, BLOCKED, $id);
-            $restricted = Lists::inList($user, RESTRICT, $id);
-            $bookmark = Lists::inList($user, BOOKMARK, $id);
-            $closeFrnds = Lists::inList($user, CLOSE_FRIENDS, $id);
-            $followers = Friends::isFollower($user, $id);
-            $followings = Friends::isFollowing($user, $id);
-            $loggedIn = User::findById($user);
-            # Check if current loggedIn user is subscribed to userToGet Profile
-            $isSubscribedToUserProfile = Subscriptions::isSubscribed($id, $user);
-            $subscription = Subscriptions::subscription($user, $id);
-        endif;
-
-
-        $_ = User::findById($id);
-        $b = Wallet::getWallet($id);
-
-        # Get the user to check subscription settings
-        $userSubscriptionSetting = SubscriptionSettings::subSettings($id);
-
-
-        $resp = [
-            'userId' => $_->id,
-            'username' => $_->username,
-            'name' => $_->display_name,
-            'email' => !$user ? $_->email : 'hidden',
-            'bio' => !$user ? $_->bio : 'hidden',
-            'location' => $_->location,
-            'avatar' => $_->avatar,
-            'website_url' => $_->website_url,
-            'amazon_url' => $_->amazon_url,
-            'phone_number' => !$user ? $_->phone_number : 'hidden',
-            'isActive' => $_->is_active ? true : false,
-            'isVerified' => $_->is_verified ? true : false,
-            'joinedOn' => $_->createdAt,
-            'wallet' => !$user ? $b->balance : 'hidden',
-            'subscriptionSetting' => $userSubscriptionSetting,
-        ];
-
-        $isMyProfile = $user == $_->id;
-        $resp['isMyProfile'] = $isMyProfile;
-
-        if ($user && !$isMyProfile) :
-            $needsRenewal = $subscription->needsRenewal ?? false;
-            if ($isMyProfile) $needsRenewal = false;
-            $resp = array_merge($resp, [
-                'isBlocked' => $blocked ? true : false,
-                'isRestricted' => $restricted ? true : false,
-                'isCloseFriend' => $closeFrnds ? true : false,
-                'isBookmarked' => $bookmark ? true : false,
-                'isFollowing' => $followers ? true : false,
-                'isFollower' => $followings ? true : false,
-                'canFollow' => !$followings ? true : false,
-                'canChat' => !$restricted ? true : false,
-                'canRestrict' => $restricted ? false : true,
-                'canBlock' => $blocked ? false : true,
-                'canViewProfile' => $blocked ? false : true,
-                'canViewFeed' => !$blocked && !$needsRenewal ? true : false,
-                'canLikeFeed' => !$blocked  || !$needsRenewal ? true : false,
-                'canCommentFeed' => $blocked || $restricted || $needsRenewal ? false : true,
-                'canReceiveChatMessage' => $blocked || $restricted ? false : true,
-                'isSubscribed' => $isSubscribedToUserProfile,
-                'canSubscribe' => !$isSubscribedToUserProfile,
-                'needsRenewal' => $subscription->needsRenewal ?? false,
-                'subscription' => $subscription,
-            ]);
-        endif;
-
-        if ($user && $loggedIn->is_admin) {
-            $resp['wallet'] = $b->balance;
-            $resp['email'] = $_->email;
-            $resp['phone_number'] = $_->phone_number;
+        foreach ($accounts as $key => $value) {
+            $accounts[$key] = Format::data($value);
         }
 
-        return (object) $resp;
+        return $accounts;
     }
 
     public static function users($admin = null, $extra = null)
