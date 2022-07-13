@@ -41,19 +41,19 @@ class Menu
     public static function company()
     {
         return [
-            'Account Information' => [
-                'link' => '',
-                'icon' => 'icon ni ni-account-setting',
-                'other' => ''
-            ],
+            // 'Account Information' => [
+            //     'link' => '',
+            //     'icon' => 'icon ni ni-account-setting',
+            //     'other' => ''
+            // ],
             'Pharmaceutical Managers' => [
                 'icon' => 'icon ni ni-users-fill',
-                'link' => '',
+                'link' => '/managers',
                 'other' => ''
             ],
-            'Product Management' => [
+            'Supply Management' => [
                 'icon' => 'icon ni ni-notes-alt',
-                'link' => '',
+                'link' => '/supply',
                 'other' => ''
             ],
             'Setting' => [
@@ -71,29 +71,19 @@ class Menu
     public static function manager()
     {
         return [
-            'Account Information' => [
-                'link' => '',
-                'icon' => '',
-                'other' => ''
-            ],
-            'Pharmaceutical Managers' => [
-                'link' => '',
-                'icon' => '',
-                'other' => ''
-            ],
             'Product Management' => [
+                'icon' => 'icon ni ni-notes-alt',
                 'link' => '',
-                'icon' => '',
                 'other' => ''
             ],
             'Setting' => [
-                'link' => '',
-                'icon' => '',
+                'icon' => 'icon ni ni-setting-alt',
+                'link' => '/account/management',
                 'other' => ''
             ],
             'Logout' => [
-                'link' => '',
-                'icon' => '',
+                'icon' => 'icon ni ni-signout',
+                'link' => '/auth/logout',
                 'other' => ''
             ],
         ];

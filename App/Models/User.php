@@ -112,14 +112,30 @@ class User extends \Core\Model
      */
     public static function updateUser($id, $item, $file = null)
     {
+
+        # Confirm User name does not exist
+        if (isset($item['username']) && $item['username'] !== '') :
+            $current = User::getUserById($id);
+            $user = User::getUserById($item['username']);
+            if ($user) {
+                if ($user->id == $current->id) :
+                    $item['username'] = '';
+                else:
+                    Res::status(409)->error("Login already taken");
+                endif;
+            }
+        endif;
+
         $data = [];
         foreach ($item as $key => $value) {
             if ($key == 'request') continue;
-            if($value == '') continue;
+            if ($value == '') continue;
             $data[$key] = is_int($key) ?
                 (int) static::clean($value) :
                 (string) static::clean($value);
         }
+
+        if (isset($data['password_hash'])) $data['password_hash'] = password_hash($data['password_hash'], PASSWORD_DEFAULT);
 
         if (!empty($data)) :
             $user = static::findAndUpdate(['id' => $id], $data);

@@ -11,3 +11,8 @@ define('ASC', 'ASC');
 
 define('LISTS', 'lists');
 define('DETAILS', 'details');
+define('NEW', 'new');
+
+define('FILE_PATH', 'Public/files');
+
+# Shipment status

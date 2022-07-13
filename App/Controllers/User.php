@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\Authenticated\Authenticated;
+use App\Helpers\Format;
 use App\Models\User as ModelsUser;
 use Core\Http\Res;
 use Core\View;
@@ -57,6 +58,13 @@ class User extends Authenticated
         $this->isAdmin();
         $users = ModelsUser::users($this->user->id, $data);
         Res::json($users);
+    }
+
+    public function user($data)
+    {
+        $this->required(['user' => $data->user ?? '']);
+        $user = ModelsUser::getUserById($data->user);
+        Res::json(Format::data($user));
     }
 
 

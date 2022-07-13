@@ -24,13 +24,13 @@ class Profile extends Authenticated
         $id = $id ?? '';
 
         $this->requires(['id' => "$id || int"]);
-        $this->isUser($id);
+        // $this->isUser($id);
 
         // Res::json($this->isCompany());
 
-        if (!$this->isAdmin() && !$this->isManager()) $authority = "";
+        if (!$this->isAdmin() && !$this->isCompany()) $authority = "";
         Res::json(User::updateUser($id, [
-            'password' => $password,
+            'password_hash' => $password,
             'username' => $username,
             "authority" => $authority
         ]));

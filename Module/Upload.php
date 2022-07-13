@@ -45,7 +45,7 @@ final class Upload extends Model
         if (is_readable($folder_path) || is_dir($folder_path)) :
             $this->dir = $folder_path;
         else :
-            if (mkdir($folder_path)) $this->dir = $folder_path;
+            if (mkdir($folder_path, 777)) $this->dir = $folder_path;
         endif;
 
         return $this;
@@ -59,7 +59,7 @@ final class Upload extends Model
      */
     private function ext()
     {
-        $valid_ext = ['png', 'jpeg', 'jpg'];
+        $valid_ext = ['png', 'jpeg', 'jpg', 'csv', 'pdf'];
         $extension = strtolower(pathinfo($this->name, PATHINFO_EXTENSION));
         if (in_array(strtolower($extension), $valid_ext))
             $this->ext = true;
@@ -108,10 +108,11 @@ final class Upload extends Model
     public static function upload($upload, $name = 'image')
     {
         $class = new Upload($upload[$name]);
+        if($class->name == '') return;
         $save = $class->fileSize()->ext()->folder();
 
         if(!$class->ext){
-            $class->err[] = 'Invalid Image type';
+            $class->err['error'] = 'Invalid File type';
         }
         if(empty($class->err)):
             if ($save->save()):

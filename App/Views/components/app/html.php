@@ -16,7 +16,7 @@
     <link id="skin-default" rel="stylesheet" href="/Public/assets/css/theme.css?ver=3.0.0">
 </head>
 
-<body class="nk-body bg-white npc-default has-aside ">
+<body class="nk-body bg-white npc-default has-aside dark-mode">
     <div class="nk-app-root">
         <!-- main @s -->
         <div class="nk-main ">

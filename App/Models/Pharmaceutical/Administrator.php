@@ -18,7 +18,8 @@ class Administrator extends Model
         extract((array) $data);
 
         if(User::emailExists($email)) Res::status(409)->error("Email Already Exists");
-
+        if(User::userExists($login)) Res::status(409)->error("Login Already Exists");
+        $password = password_hash($password, PASSWORD_DEFAULT);
        $saved = self::dump([
             'username' => self::clean($login),
             'email' => self::clean($email),

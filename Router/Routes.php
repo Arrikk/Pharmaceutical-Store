@@ -11,5 +11,11 @@ $router->add('login', ['controller' => 'auth', 'action' => 'login', 'namespace' 
 $router->add('auth/setLogin', ['controller' => 'auth', 'action' => 'set-login', 'namespace' => 'Fe']); 
 $router->add('auth/logout', ['controller' => 'auth', 'action' => 'logout', 'namespace' => 'Fe']); 
 $router->add('account/management', ['controller' => 'account', 'action' => 'management', 'namespace' => 'Fe']); 
+$router->add('managers', ['controller' => 'managers', 'action' => 'manage', 'namespace' => 'Fe']); 
+$router->add('managers/details', ['controller' => 'managers', 'action' => 'details', 'namespace' => 'Fe']); 
+
+$router->add('supply', ['controller' => 'supply', 'action' => 'list', 'namespace' => 'Fe']); 
+$router->add('supply/', ['controller' => 'supply', 'action' => 'supply', 'namespace' => 'Fe']); 
+
 
 $router->add('{controller}/{action}')->get();

@@ -11,14 +11,14 @@ class Account extends Admin
     {
         View::draw('account/index',[
             'page' => DETAILS,
-            '_authority' => COMPANY 
+            '_authority' => $this->user->authority 
         ]);
     }
 
     public function _management()
     {
         View::draw('account/management', [
-            '_authority' => COMPANY,
+            '_authority' => $this->user->authority,
             '_other' => User::getUser($this->user->id)
         ]);
     }

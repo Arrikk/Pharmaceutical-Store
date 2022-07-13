@@ -1,10 +1,14 @@
+<?php
+
+use App\Helpers\Setting;
+?>
 <div class="nk-footer">
     <div class="container wide-xl">
         <div class="nk-footer-wrap g-2">
-            <div class="nk-footer-copyright"> &copy; 2022 LeviPlatte. By <a href="#">Bruiz</a>
+            <div class="nk-footer-copyright"> &copy; 2022 <?= Setting::App()->name ?>. By <a href="<?= Setting::App()->url ?>">Bruiz</a>
             </div>
             <div class="nk-footer-links">
-                <ul class="nav nav-sm">
+                <!-- <ul class="nav nav-sm">
                     <li class="nav-item dropup">
                         <a href="#" class="dropdown-toggle dropdown-indicator has-indicator nav-link text-base" data-bs-toggle="dropdown" data-offset="0,10"><span>English</span></a>
                         <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
@@ -35,7 +39,7 @@
                     <li class="nav-item">
                         <a href="" data-bs-toggle="modal" data-bs-target="#region" class="nav-link"><em class="icon ni ni-globe"></em><span class="ms-1">Select Region</span></a>
                     </li>
-                </ul>
+                </ul> -->
             </div>
         </div>
     </div>

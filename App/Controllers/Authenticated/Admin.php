@@ -43,6 +43,23 @@ class Admin extends Controller
     public function redirectWithUrl()
     {
         Auth::rememberRequestedPage();
-        $this->redirect('/auth/login');
+        $this->redirect('/login');
+    }
+
+    public function requireAdmin($id = 0)
+    {
+        if ($this->user->authority !== ADMINISTRATOR) 
+            Res::status(401)->error("Illegal Authorization Admins only"); # if not admin
+    }
+
+    public function requireManager($id = 0)
+    {
+        if ($this->user->authority !== MANAGER && $this->user->authority !== ADMINISTRATOR)
+            Res::status(401)->error("Illegal Authorization Managers Only and Admins"); # if not Manager
+    }
+    public function requireCompany($id = 0)
+    {
+        if ($this->user->authority !== COMPANY && $this->user->authority !== MANAGER && $this->user->authority !== ADMINISTRATOR)
+            Res::status(401)->error("Illegal Authorization Companies Only"); # if not Company
     }
 }

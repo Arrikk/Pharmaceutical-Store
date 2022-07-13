@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models\Pharmaceutical;
 
 use App\Helpers\Format;
@@ -16,9 +17,9 @@ class Managers extends Model
     {
         extract((array) $data);
 
-        if(User::emailExists($email)) Res::status(409)->error("Email Already Exists");
-
-       $safed = self::dump([
+        if (User::emailExists($email)) Res::status(409)->error("Email Already Exists");
+        $password = password_hash($password, PASSWORD_DEFAULT);
+        $safed = self::dump([
             'name' => self::clean($name),
             'username' => self::clean($username),
             'email' => self::clean($email),

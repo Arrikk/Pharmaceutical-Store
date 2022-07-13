@@ -11,6 +11,7 @@ return array(
     'Router\\' => array($baseDir . '/Router'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'Module\\' => array($baseDir . '/Module'),
+    'League\\Csv\\' => array($vendorDir . '/league/csv/src'),
     'Core\\' => array($baseDir . '/Core'),
     'App\\' => array($baseDir . '/App'),
 );

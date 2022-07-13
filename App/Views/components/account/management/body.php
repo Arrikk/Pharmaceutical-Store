@@ -32,7 +32,7 @@
                             <div class="profile-ud-item">
                                 <div class="profile-ud wider">
                                     <span class="profile-ud-label">Login Id</span>
-                                    <span class="profile-ud-value"> <?= $username ?? '' ?> </span>
+                                    <span class="profile-ud-value"> <?= ucwords($username ?? '') ?> </span>
                                 </div>
                             </div>
                             <div class="profile-ud-item">
@@ -44,11 +44,13 @@
                             <div class="profile-ud-item">
                                 <div class="profile-ud wider">
                                     <span class="profile-ud-label">Classification</span>
-                                    <span class="profile-ud-value"><?php
-                                                                    if ($isAdmin) echo ADMINISTRATOR;
-                                                                    if ($isManager) echo MANAGER;
-                                                                    if ($isCompany) echo COMPANY;
-                                                                    ?></span>
+                                    <span class="profile-ud-value">
+                                        <?php
+                                            if ($isAdmin) echo ucwords(str_replace('_', ' ',ADMINISTRATOR));
+                                            if ($isManager) echo ucwords(str_replace('_', ' ', MANAGER));
+                                            if ($isCompany) echo ucwords(str_replace('_', ' ', COMPANY));
+                                        ?>
+                                    </span>
                                 </div>
                             </div>
                             <div class="profile-ud-item">
@@ -130,22 +132,22 @@
                                                 <input type="password" class="form-control" id="confirm-password" placeholder="Re-Enter Password">
                                             </div>
                                         </div>
-                                </div>
-                                <div class="row g-3">
-                                    <div class="col-lg-7 offset-lg-5">
-                                        <div class="form-group mt-2">
-                                            <button id="update-password" type="submit" class="btn btn-lg btn-primary">Update</button>
+                                    </div>
+                                    <div class="row g-3">
+                                        <div class="col-lg-7 offset-lg-5">
+                                            <div class="form-group mt-2">
+                                                <button id="update-password" type="submit" class="btn btn-lg btn-primary">Update</button>
+                                            </div>
                                         </div>
                                     </div>
+                                    </form>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
+                    <!--tab content-->
                 </div>
+                <!--card inner-->
             </div>
-            <!--tab content-->
+            <!--card-->
         </div>
-        <!--card inner-->
-    </div>
-    <!--card-->
-</div>
