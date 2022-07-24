@@ -18,7 +18,8 @@ class Format
             'companyName' => $data->company_name,
             'approvalCode' => $data->approval_code,
             'classification' => ucwords(str_replace('_', ' ', $data->authority)),
-            'manager' => $data->manager
+            'manager' => $data->manager,
+            'updated' => $data->updatedAt
         ];
     }
 
@@ -93,6 +94,23 @@ class Format
     public function lowerCase($string)
     {
         return strtolower($string);
+    }
+
+    public static function page($data)
+    {
+        $start = $data->start ?? 0;
+        $length = $data->length ?? 10;
+        $searchQuery = $data->search['value'] ?? null;
+        $orderDirection = $data->order[0]['dir'] ?? null;
+        $sortColumn = $data->order[0]['column'] ?? null;
+
+        return [
+            'start' => $start,
+            'length' => $length,
+            'searchQuery' => $searchQuery,
+            'orderDirection' => $orderDirection,
+            'sortColumn' => $sortColumn
+        ];
     }
 
 }

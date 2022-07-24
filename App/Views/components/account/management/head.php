@@ -7,7 +7,7 @@
                 <div class="nk-block-des text-soft">
                     <ul class="list-inline">
                         <li>User ID: <span class="text-base">UD<?= $user->id ?? '' ?></span></li>
-                        <li>Last Login: <span class="text-base">15 Feb, 2019 01:02 PM</span></li>
+                        <!-- <li>Last Login: <span class="text-base">15 Feb, 2019 01:02 PM</span></li> -->
                     </ul>
                 </div>
             </div>

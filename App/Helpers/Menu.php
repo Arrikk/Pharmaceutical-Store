@@ -6,34 +6,24 @@ class Menu
     public static function admin()
     {
         return [
-            'Account Management' => [
-                'link' => '',
-                'icon' => '',
+            'Registered Companies' => [
+                'link' => '/companies',
+                'icon' => 'icon ni ni-briefcase',
                 'other' => ''
             ],
-            'Pharmaceutical Companies' => [
-                'link' => '',
-                'icon' => '',
-                'other' => ''
-            ],
-            'Pharmaceutical Managers' => [
-                'link' => '',
-                'icon' => '',
-                'other' => ''
-            ],
-            'Product Management' => [
-                'link' => '',
-                'icon' => '',
+            'Approved Companies' => [
+                'link' => '/approved',
+                'icon' => 'icon ni ni-linux-server',
                 'other' => ''
             ],
             'Setting' => [
-                'link' => '',
-                'icon' => '',
+                'icon' => 'icon ni ni-setting-alt',
+                'link' => '/account/management',
                 'other' => ''
             ],
             'Logout' => [
-                'link' => '',
-                'icon' => '',
+                'icon' => 'icon ni ni-signout',
+                'link' => '/auth/logout',
                 'other' => ''
             ],
         ];

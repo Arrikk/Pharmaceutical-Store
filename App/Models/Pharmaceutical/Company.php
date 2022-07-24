@@ -57,11 +57,54 @@ class Company extends Model
         $other = Format::data(User::getUserById($id));
         $user = Format::data(User::getUserById($user));
 
-        if($user->approvalCode == $other->approvalCode && $user->isCompany)
+        if($user->approvalCode == $other->approvalCode && $user->isCompany || $user->isAdmin)
         return self::findAndDelete([
             'id' => $id,
         ]);
 
         Res::status(401)->error("Operation Denied");
+    }
+    
+    public static function companies($data, $account = COMPANY)
+    {
+        if ($data->bruiz ?? null)
+            Res::json([
+                'total' => self::totalCompanies()->totalRec,
+                'data' => User::select('*', 'users')
+                    ->where('authority', COMPANY)
+                    ->order('id', 'DESC')->limit(10)->exec()
+            ]);
+
+        $pagination = Format::page($data);
+        extract($pagination);
+
+        $stmt = self::select('*', 'users')
+            ->where('authority', COMPANY);
+
+        if ($searchQuery)
+            $stmt->and('company_name', "%$searchQuery%", 'LIKE')->or('approval_code', "%$searchQuery%", 'LIKE');
+
+        if ($orderDirection) {
+            $stmt->order('company_name', $orderDirection);
+        } else {
+            $stmt->order('id', 'desc');
+        }
+        $stmt = $stmt->limit("$start, $length")->exec();
+
+        foreach ($stmt as $key => $value) {
+            $stmt[$key] = (object) Format::data($value);
+        }
+
+        return (object)[
+            'data' => $stmt,
+            'total' => self::totalCompanies()->totalRec
+        ];
+        // return self::find();
+    }
+
+    public static function totalCompanies()
+    {
+        return self::select('count(*) as totalRec', 'users')
+            ->where('authority', COMPANY)->obj()->exec();
     }
 }

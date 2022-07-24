@@ -43,6 +43,12 @@ function setData(data) {
   $(".approval_code").val(data.approvalCode);
   $(".company_name").val(data.companyName);
   $(".username").val(data.username);
+  if(data.isManager){
+    $('input[value="pharmaceutical_company_manager"]').attr('checked', true)
+  }
+  if(data.isCompany){
+    $('input[value="pharmaceutical_company"]').attr('checked', true)
+  }
 }
 
 

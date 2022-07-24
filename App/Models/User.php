@@ -4,17 +4,6 @@ namespace App\Models;
 
 use App\Helpers\Format;
 use App\Helpers\Paginate;
-use App\Models\Wallet\Transactions;
-use App\Models\Lists\Blocked;
-use App\Models\Lists\Bookmark;
-use App\Models\Lists\CloseFriends;
-use App\Models\Lists\Lists;
-use App\Models\Lists\Restrict;
-use App\Models\Settings\Display;
-use App\Models\Settings\Privacy;
-use App\Models\Subscriptions\Subscriptions;
-use App\Models\Subscriptions\SubscriptionSettings;
-use App\Models\User\Friends;
 use App\Models\Wallet\Wallet;
 use App\Token;
 use Core\Traits\Model;
@@ -78,31 +67,31 @@ class User extends \Core\Model
      */
     public function save()
     {
-        $token = new Token();
-        $this->hashed = $token->getHashed();
-        $this->token = $token->getValue();
+        if($this->getUser($this->login)) Res::status(404)->error('User already Exists');
 
-        $this->validate();
+        if ($this->emailExists($this->email, $this->id ?? null))
+           Res::status(409)->error("Email already exists");
 
-        if (empty($this->errors)) {
+        $password = password_hash($this->password, PASSWORD_DEFAULT);
+        $this->time = date('y-m-d H:i:s', time() + 60 * 60 * 3);
 
-            $password = password_hash($this->password, PASSWORD_DEFAULT);
-            $this->time = date('y-m-d H:i:s', time() + 60 * 60 * 3);
-            $user = static::dump([
-                'email' => static::clean($this->email),
-                'username' => static::clean($this->username),
-                'display_name' => static::clean($this->name),
-                'is_admin' => $this->is_admin ?? 0,
-                'password_hash' => $password,
-                'password_reset_hash' => $this->hashed,
-                'password_reset_expiry' => $this->time
-            ]);
-            if (!$user) return Res::status(500)->send('Server Error');
-            $user->referralCode = $this->referral ?? '';
-            $this->makeDefaultSettings($user);
-            return $this->getUser($user->id);
-        };
-        return Res::status(400)->json($this->errors);
+        
+        $company = Companies::company($this->approval_code);
+        if(!$company) Res::status(404)->error('Invalid Approval Code');
+        self::authority($this->authority, $company->code);
+
+        $isAlreadyCompanyAdmin = '';
+
+        $user = static::dump([
+            'approval_code' => $company->code,
+            'company_name' => $company->name,
+            'username' => static::clean($this->login),
+            'authority' => $this->authority,
+            'password_hash' => $password,
+        ]);
+
+        if (!$user) return Res::status(500)->error('Server Error');
+        Res::json(200)->json($this->getUser($user->id));
     }
     /**
      * Update a user account
@@ -116,11 +105,11 @@ class User extends \Core\Model
         # Confirm User name does not exist
         if (isset($item['username']) && $item['username'] !== '') :
             $current = User::getUserById($id);
-            $user = User::getUserById($item['username']);
+            $user = User::getUser($item['username']);
             if ($user) {
                 if ($user->id == $current->id) :
                     $item['username'] = '';
-                else:
+                else :
                     Res::status(409)->error("Login already taken");
                 endif;
             }
@@ -243,9 +232,35 @@ class User extends \Core\Model
         return $user;
     }
 
+    public static function authority($authority, $code)
+    {
+        if($authority == COMPANY):
+            $company = self::findOne([
+                'authority' => COMPANY,
+                'and.approval_code' => $code
+            ]);
+            if($company) Res::status(400)->error('Only one Company Admin is allowed');
+            return true;
+        endif;
+
+        if($authority == MANAGER):
+            if(!$company = self::findOne([
+                'authority' => COMPANY,
+                'and.approval_code' => $code
+            ])) Res::status(400)->error("Admin Registeration is Required");
+            
+            $manager = self::findOne([
+                'authority' => MANAGER,
+                'and.approval_code' => $code
+            ], 'count(*) as totalManagers');
+            if($manager->totalManagers >= 2) Res::status(400)->error("You have exceeded the maximum of two (2) manaers");
+        endif;
+    }
+
     public static function getUser($id)
     {
-        $user = self::findOne(['id' => $id]);
+        $user = self::findOne(['id' => $id, 'or.username' => $id]);
+        if (!$user) return;
         return Format::data($user);
     }
 

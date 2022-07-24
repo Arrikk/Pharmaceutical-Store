@@ -85,10 +85,10 @@ body %}
     loading = load;
     loading
       ? btn.html(`
-      <div class="spinner-border" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div> Sign in
-      `)
+        <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div> Sign in
+        `)
       : btn.html(`Sign in`);
   }
 
@@ -113,19 +113,24 @@ body %}
         .post("/api/login", data)
         .then((res) => {
           setLoader();
-          localStorage.setItem('token', res.data.token)
-          axios.get(`/auth/setLogin?token=${res.data.token}`).then(res => {
+          localStorage.setItem("token", res.data.token);
+          axios.get(`/auth/setLogin?token=${res.data.token}`).then((res) => {
             toastr.clear();
             NioApp.Toast("Successfully Loggedin", "success");
-            location.href = '/'
+            location.href = "/";
           });
-        }).catch((err) => {
+        })
+        .catch((err) => {
           toastr.clear();
           setLoader();
-          let error = err.response.data.error
+          let error = err.response.data.error;
           NioApp.Toast(error.login ? error.login : error, "error");
         });
     }
   });
+
+  axios
+    .get("https://middey.gospeltribe.one/?rest_route=/rimplenet/v1/users")
+    .then((res) => console.log(res.data));
 </script>
 {% endblock %}

@@ -12,7 +12,7 @@ class Route
         $router = new Router;
         require __DIR__.'/Api.php';
         require __DIR__.'/Routes.php';
-        require 'App/variables.php';
+        require 'App/Variables.php';
         
         /**
          * Match the Requested Url

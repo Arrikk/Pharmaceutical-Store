@@ -30,4 +30,11 @@ $router->add('api/supply/', ['controller' => 'supply', 'action' => 'supply'])->p
 $router->add('api/supply/update', ['controller' => 'supply', 'action' => 'update'])->post();
 $router->add('api/supply/import', ['controller' => 'supply', 'action' => 'import'])->post();
 
+$router->add('api/companies', ['controller' => 'company', 'action' => 'companies', 'namespace' => 'Accounts']);
+$router->add('api/company/save', ['controller' => 'company', 'action' => 'save', 'namespace' => 'Accounts'])->post();
+$router->add('api/company/view', ['controller' => 'companies', 'action' => 'view']);
+
+$router->add('api/approved/search', ['controller' => 'companies', 'action' => 'search']);
+$router->add('api/approved', ['controller' => 'companies', 'action' => 'companies']);
+$router->add('api/approved/import', ['controller' => 'companies', 'action' => 'import']);
 

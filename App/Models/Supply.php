@@ -44,12 +44,9 @@ class Supply extends Model
             '$.limit' => 10
         ])));
 
-        $start = $data->start ?? 0;
-        $length = $data->length ?? 10;
-        $searchQuery = $data->search['value'] ?? null;
-        $orderDirection = $data->order[0]['dir'] ?? null;
-        $sortColumn = $data->order[0]['column'] ?? null;
-
+        $pagination = Format::page($data);
+        extract($pagination);
+        
         $stmt = self::select('*', self::$table)
             ->where('company', $user->approval_code);
         if ($searchQuery)

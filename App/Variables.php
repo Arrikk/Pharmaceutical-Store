@@ -1,6 +1,7 @@
 <?php
 # account types
 define('ADMINISTRATOR', 'administrator');
+// define('COMPANY_ADMINISTRATOR', 'pharmaceutical_company_administrator');
 define('COMPANY', 'pharmaceutical_company');
 define('MANAGER', 'pharmaceutical_company_manager');
 

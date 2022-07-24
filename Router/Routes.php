@@ -13,6 +13,9 @@ $router->add('auth/logout', ['controller' => 'auth', 'action' => 'logout', 'name
 $router->add('account/management', ['controller' => 'account', 'action' => 'management', 'namespace' => 'Fe']); 
 $router->add('managers', ['controller' => 'managers', 'action' => 'manage', 'namespace' => 'Fe']); 
 $router->add('managers/details', ['controller' => 'managers', 'action' => 'details', 'namespace' => 'Fe']); 
+$router->add('companies', ['controller' => 'companies', 'action' => 'companies', 'namespace' => 'Fe']); 
+$router->add('approved', ['controller' => 'companies', 'action' => 'approved', 'namespace' => 'Fe']); 
+$router->add('company', ['controller' => 'companies', 'action' => 'company', 'namespace' => 'Fe']); 
 
 $router->add('supply', ['controller' => 'supply', 'action' => 'list', 'namespace' => 'Fe']); 
 $router->add('supply/', ['controller' => 'supply', 'action' => 'supply', 'namespace' => 'Fe']); 

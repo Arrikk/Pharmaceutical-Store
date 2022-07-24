@@ -5,7 +5,7 @@ use App\Controllers\Authenticated\Authenticated;
 use App\Models\Pharmaceutical\Administrator;
 use App\Models\Pharmaceutical\Company;
 use App\Models\User;
-use Core\Http\Res;
+use Core\Http\Res;0
 
 class Admin extends Authenticated
 {

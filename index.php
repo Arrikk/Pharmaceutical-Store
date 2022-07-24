@@ -11,7 +11,7 @@
 /**
  * Autoload
  */
-require 'vendor/autoload.php';
+require 'Vendor/autoload.php';
 /**
  * Add route to the Routing Table
  */
